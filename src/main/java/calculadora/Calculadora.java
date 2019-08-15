@@ -101,23 +101,28 @@ public class Calculadora {
 		return indice;
 	}
 	
-	public static double resolBasicas(ArrayList<String> calculo) {
+	public static double resolBasicas(ArrayList<String> calculo, int indice) {
 		double resultado = 0;
-		switch (calculo.get(1)) {
-			case "+":
-				resultado = Double.parseDouble(calculo.get(0)) + Double.parseDouble(calculo.get(2));
-				break;
-			case "-":
-				resultado = Double.parseDouble(calculo.get(0)) - Double.parseDouble(calculo.get(2));
-				break;
-			case "*":
-				resultado = Double.parseDouble(calculo.get(0)) * Double.parseDouble(calculo.get(2));
-				break;
-			case "/":
-				if (calculo.get(2) == "0") throw new IllegalArgumentException("Error de Sintaxis: El denominador de una division no puede ser cero");
-				resultado = Double.parseDouble(calculo.get(0)) / Double.parseDouble(calculo.get(2));
-				break;
+		if (calculo.size() == 1) return Double.parseDouble(calculo.get(indice));
+		else { 
+			if (calculo.size() >= 3) {
+				switch (calculo.get(indice + 1)) {
+					case "+":
+						resultado = resolBasicas(Calculadora.toArray(calculo.get(indice)), indice) + resolBasicas(Calculadora.toArray(calculo.get(indice + 2)), indice);
+						break;
+					case "-":
+						resultado = resolBasicas(Calculadora.toArray(calculo.get(indice)), indice) - resolBasicas(Calculadora.toArray(calculo.get(indice + 2)), indice);
+						break;
+					case "*":
+						resultado = resolBasicas(Calculadora.toArray(calculo.get(indice)), indice) * resolBasicas(Calculadora.toArray(calculo.get(indice + 2)), indice);
+						break;
+					case "/":
+						if (calculo.get(indice + 2) == "0") throw new IllegalArgumentException("Error de Sintaxis: El denominador de una division no puede ser cero");
+						resultado = resolBasicas(Calculadora.toArray(calculo.get(indice)), indice) / resolBasicas(Calculadora.toArray(calculo.get(indice + 2)), indice);
+						break;
+				}
 			}
+		}
 		return resultado;
 	}
 
@@ -125,13 +130,12 @@ public class Calculadora {
 	public static void resolArreglo(ArrayList<String> calculo) {
 		int indice = 0;
 		while (indice < calculo.size()) {
-			if (calculo.get(indice).length() == 3) {
-				ArrayList<String> arrStrAux = Calculadora.toArray(calculo.get(indice));
+			ArrayList<String> arrStrAux = Calculadora.toArray(calculo.get(indice));
+			if (arrStrAux.size() == 3) {
 				System.out.println(arrStrAux.toString());
-				calculo.set(indice, String.valueOf(resolBasicas(arrStrAux)));
+				calculo.set(indice, String.valueOf(resolBasicas(arrStrAux, 0)));
 			} else {
 				if (calculo.get(indice).length() >= 3) {
-					ArrayList<String> arrStrAux = Calculadora.toArray(calculo.get(indice));
 					System.out.println(arrStrAux.toString());
 					resolArreglo(arrStrAux);
 				}
@@ -152,11 +156,6 @@ public class Calculadora {
 		double paramDouble = Double.parseDouble(paramString);
 		return Math.log(paramDouble);
 	}
-	
-	//public static String simpParamLog(String calculo) {
-	//	int indice = 4;
-	//	String paramString = calculo.substring(indice,calculo.length());
-	//}
 }
 
 

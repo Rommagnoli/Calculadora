@@ -9,7 +9,7 @@ public class AppCalculadora {
 		ArrayList<String> ejemploArray = new ArrayList<String>();
 		ejemploArray = Calculadora.toArray(ejemplo);
 		//System.out.println(ejemploArray.toString());
-		ejemplo = "5+2*(2/3)-1+(2*(3/2))";
+		ejemplo = "5+2*(2/3)-1+(2*(3/2))+((3/2)*2)";
 		ejemploArray = Calculadora.toArray(ejemplo);
 		System.out.println(ejemploArray.toString());
 		Calculadora.resolArreglo(ejemploArray);
