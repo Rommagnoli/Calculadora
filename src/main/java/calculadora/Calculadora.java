@@ -20,98 +20,66 @@ public class Calculadora {
 	}
 
 	/**
-	 * Metodo que dado dos párametros, los suma.
-	 * @param a Parámetro al que se le suma el segundo.
-	 * @param b Parámetro a sumar al primero.
-	 * @return Retorna la suma de ambos parámetros.
-	 */
-	public double suma(double a, double b) {
-		return a + b;
-	}
-	
-	/**
-	 * Método que dado dos parámetros, los resta.
-	 * @param a Parámetro al que se le resta el segundo.
-	 * @param b Parámetro a restar al primero.
-	 * @return Retorna la resta de los parámetros.
-	 */
-	public double resta(double a, double b) {
-		return a - b;
-	}
-
-	/**
-	 * Método que dado dos parámetros, los multiplica.
-	 * @param a Primer parámetro a multiplicar.
-	 * @param b Segudno parámetro a multiplicar.
-	 * @return Retorna la multiplicacion de ambos parámetros.
-	 */
-	public double multip(double a, double b) {
-		return a * b;
-	}
-	
-	/**
-	 * Metodo que dado dos parametros divide el primero por el segundo.
-	 * @param num Numerador de la división.
-	 * @param den Denominador de la division.
-	 * @return Retorna la division de ambos parámetros.
-	 * @throws IllegalArgumentException Lanza la excepción cuando el denominador es cero.
-	 */
-	public double div(double num, double den) throws IllegalArgumentException  {
-		if (den == 0) throw new IllegalArgumentException("El denominador de una division debe ser distinto de cero");
-		else return num / den;
-	}
-	
-	/**
-	 * Método que dado dos parametros, calcula la n-ecima potencia del primer parámetro.
-	 * @param base Parámetro que representa la base de la potencia.
-	 * @param potencia Parámetro que representa el exponente.
-	 * @return Retorna el resultado de multiplicar n veces la base de la potencia.
-	 */
-	public double pot(double base, double potencia) {
-		return Math.pow(base,potencia);
-	}
-	
-	/**
-	 * Método que dado un numero, calcula su logartimo neperiano.
-	 * @param a Parámetro al que calcularle el logaritmo
-	 * @return Retorna el logaritmo neperiano del parámetro
-	 */
-	public double logNep(double a) {
-		return Math.log(a);
-	}
-	
-	/**
-	 * Método privado que dado una cadena que representa un calculo matemático,
+	 * Método que dado una cadena que representa un calculo matemático,
 	 * va guardando sus operandos y operadores en un arreglo, respetando paretensis.
 	 * @param calculo String donde se encuentra en cálculo a realizar.
 	 * @return Un arreglo con el calculo a realizar.
 	 */
 	public static ArrayList<String> toArray(String calculo) {
 		ArrayList<String> calculoArray = new ArrayList<String>();
-		for (int indice = 0; indice < calculo.length(); indice++) {
-			if (calculo.charAt(indice) == '(') {
-				int posParFinal = Calculadora.parentesisFinal(calculo.substring(indice + 1, calculo.length()));
-				calculoArray.add(calculo.substring(indice + 1, indice + posParFinal));
-				indice = indice + posParFinal;
-			} else {
-				if (calculo.charAt(indice) == 'l') {
-					calculoArray.add("log");
+		int indice = 0;
+		while (indice < calculo.length()) {
+			switch (calculo.charAt(indice)) {
+				case '(':
+					int posParFinal = Calculadora.parentesisFinal(calculo.substring(indice + 1, calculo.length()));
+					calculoArray.add(calculo.substring(indice + 1, indice + posParFinal));
+					indice = indice + posParFinal;
+					indice++;
+					break;
+					
+				case 'l':
 					indice = indice + 3;
-				} else {
-					if (calculo.charAt(indice) == 'e') {
-						calculoArray.add("exp");
-						indice = indice + 3;
-					} else {
-						int indiceInicio = indice;
-						while (calculo.length() > indice && calculo.charAt(indice) != '+' && calculo.charAt(indice) != '-' && calculo.charAt(indice) != '*' && calculo.charAt(indice) != '/') {
-							indice++;
-						}	
-						if (indiceInicio != indice) {
-							calculoArray.add(calculo.substring(indiceInicio,indice));
-						}
-						calculoArray.add(calculo.substring(indice, indice + 1));
+					posParFinal = Calculadora.parentesisFinal(calculo.substring(indice + 1, calculo.length()));
+					calculoArray.add("log(" + calculo.substring(indice + 1, indice + posParFinal + 1));
+					indice = indice + posParFinal;
+					indice++;
+					break;
+				
+				case 'e':
+					indice = indice + 3;
+					posParFinal = Calculadora.parentesisFinal(calculo.substring(indice + 1, calculo.length()));
+					calculoArray.add("exp(" + calculo.substring(indice + 1, indice + posParFinal + 1));
+					indice = indice + posParFinal;
+					indice++;
+					break;
+				
+				case '+':
+					calculoArray.add("+");
+					indice++;
+					break;
+					
+				case '-':
+					calculoArray.add("-");
+					indice++;
+					break;
+					
+				case '*':
+					calculoArray.add("*");
+					indice++;
+					break;
+					
+				case '/':
+					calculoArray.add("/");
+					indice++;
+					break;
+					
+				default:
+					int indiceInicio = indice;
+					while (indice < calculo.length() && calculo.charAt(indice) != '+' && calculo.charAt(indice) != '-' && calculo.charAt(indice) != '*' && calculo.charAt(indice) != '/') {
+						indice++;
 					}
-				}
+					calculoArray.add(calculo.substring(indiceInicio,indice));
+					break;
 			}
 		}
 		return calculoArray;
@@ -133,5 +101,76 @@ public class Calculadora {
 		return indice;
 	}
 	
-	//public 
+	public static double resolBasicas(ArrayList<String> calculo) {
+		double resultado = 0;
+		switch (calculo.get(1)) {
+			case "+":
+				resultado = Double.parseDouble(calculo.get(0)) + Double.parseDouble(calculo.get(2));
+				break;
+			case "-":
+				resultado = Double.parseDouble(calculo.get(0)) - Double.parseDouble(calculo.get(2));
+				break;
+			case "*":
+				resultado = Double.parseDouble(calculo.get(0)) * Double.parseDouble(calculo.get(2));
+				break;
+			case "/":
+				if (calculo.get(2) == "0") throw new IllegalArgumentException("Error de Sintaxis: El denominador de una division no puede ser cero");
+				resultado = Double.parseDouble(calculo.get(0)) / Double.parseDouble(calculo.get(2));
+				break;
+			}
+		return resultado;
+	}
+
+			
+	public static void resolArreglo(ArrayList<String> calculo) {
+		int indice = 0;
+		while (indice < calculo.size()) {
+			if (calculo.get(indice).length() == 3) {
+				ArrayList<String> arrStrAux = Calculadora.toArray(calculo.get(indice));
+				System.out.println(arrStrAux.toString());
+				calculo.set(indice, String.valueOf(resolBasicas(arrStrAux)));
+			} else {
+				if (calculo.get(indice).length() >= 3) {
+					ArrayList<String> arrStrAux = Calculadora.toArray(calculo.get(indice));
+					System.out.println(arrStrAux.toString());
+					resolArreglo(arrStrAux);
+				}
+			}
+			indice++;
+		}
+	}
+			
+	
+	/**
+	 * Método que calcula el logaritmo. Ingresa una String desde la calculadora con el valor a calcular y retorna un Double con el resultado. 
+	 * @param calculo String que es ingresado a la calculadora para su calculo.
+	 * @return Retorna el logaritmo del numero ingresado.
+	 */
+	private static Double resolLog(String calculo) { 
+		int indice = 4;
+		String paramString = calculo.substring(indice,calculo.length());
+		double paramDouble = Double.parseDouble(paramString);
+		return Math.log(paramDouble);
+	}
+	
+	//public static String simpParamLog(String calculo) {
+	//	int indice = 4;
+	//	String paramString = calculo.substring(indice,calculo.length());
+	//}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
